@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加载一个正方形的带贴图</title>
+    <script src="../node_modules/three/build/three.js"></script>
+  <script src="../node_modules/three/examples/js/libs/opentype.min.js"></script>
+  <script src="../node_modules/three/examples/js/controls/OrbitControls.js"></script>
+  <script src="../node_modules/three/examples/js/loaders/TTFLoader.js"></script>
+  <script src="../node_modules/three/examples/js/libs/stats.min.js"></script>
+  <script src="../node_modules/three/examples/js/libs/dat.gui.min.js"></script>
+  <script src="../node_modules/three/examples/js/loaders/GLTFLoader.js"></script>
+</head>
+<body>
+    <div id="container"></div>
+    <script type="module">
+        let camera, scene, renderer, stats;
+        var control;
+        let windowHalfX = window.innerWidth / 2;
+        init();
+        animate();
+        function init(){
+            let container=document.getElementById('container');
+            scene=new THREE.Scene();
+            scene.background=new THREE.Color(0xf0f0f0);
+            camera = new THREE.PerspectiveCamera(90,window.innerWidth/window.innerHeight,0.1,100);
+            camera.position.set(0,0,0);
+            scene.add(camera);
+            //添加点光源
+            const light= new THREE.PointLight(0xffffff,0.8);
+            scene.add(light);
+
+            const loader = new THREE.GLTFLoader();
+let circlescene
+            loader.load( './resource/untitled.glb', function ( gltf ) {
+                gltf.scene.add(new THREE.AmbientLight(0xffffff));
+                circlescene=gltf.scene;
+	        scene.add( gltf.scene );
+            
+
+            }, undefined, function ( error ) {
+
+	        console.error( error );
+
+            } );
+
+            renderer = new THREE.WebGLRenderer( { antialias: true } );
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            container.appendChild( renderer.domElement );
+
+            //stats = new Stats();
+            //container.appendChild( stats.dom );
+            //control = new THREE.OrbitControls(camera, container);
+            window.addEventListener( 'resize', onWindowResize );
+            var bMouseDown = false;
+            var x = -1;
+				var y =-1;
+            container.onmousedown=function(event){
+					event.preventDefault();
+					x=event.clientX;
+					y=event.clientY;
+					bMouseDown = true;
+				}
+				container.onmouseup=function(event){
+					event.preventDefault();
+					bMouseDown = false;
+				}
+				container.onmousemove=function(event){
+					event.preventDefault();
+					if(bMouseDown)
+					{
+						circlescene.rotation.y += -0.005*(event.clientX-x);
+						circlescene.rotation.x += -0.005*(event.clientY-y);
+						if(circlescene.rotation.x>Math.PI/2)
+						{
+							circlescene.rotation.x = Math.PI/2
+						}
+						if(circlescene.rotation.x<-Math.PI/2)
+						{
+							circlescene.rotation.x = -Math.PI/2
+						}
+						x=event.clientX;
+						y=event.clientY;
+					}
+				}
+				container.onmousewheel=function(event){
+					event.preventDefault();
+					if(event.wheelDelta!=0){
+						camera.fov+=event.wheelDelta>0?-1:1;
+						if(camera.fov>150)
+						{
+						  camera.fov=150;
+						}
+						else if(camera.fov < 30)
+						{
+							camera.fov = 30;
+						}
+						camera.updateProjectionMatrix();
+					}
+				}
+
+        }
+        function onWindowResize() {
+
+windowHalfX = window.innerWidth / 2;
+
+camera.aspect = window.innerWidth / window.innerHeight;
+camera.updateProjectionMatrix();
+
+renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+        function animate(){
+        requestAnimationFrame(animate);
+        render();
+
+        }
+        function render(){
+        renderer.render(scene,camera);
+        }
+        
+
+        window['camera'] = camera        
+
+    </script>
+</body>
+</html>

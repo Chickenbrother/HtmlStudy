@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="./stylesheet/learnjs.css">
+    <title>学习js 基础</title>
+    <script>
+        function showTime() {
+            document.getElementById("time_h2").innerHTML = new Date();
+
+        }
+        function getRndInteger(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+        function changeTxtcontent() {
+            txtStr = ['你很认真', '该吃饭了', '加油哦']
+            document.getElementById("time_h3").innerHTML = txtStr[getRndInteger(0, 2)];
+
+        }
+        function changeTxtpropterty() {
+            txtStr = ['你很认真', '该吃饭了', '加油哦']
+            //document.getElementById("time_h4").innerText = txtStr[getRndInteger(0, 2)];
+            console.info(`public void PaperToModelspace_Test(string dwgPath)
+        {
+            String fileForReadIn = dwgPath;
+            MemoryManager mMan = MemoryManager.GetMemoryManager();
+            MemoryTransaction mTr1 = mMan.StartTransaction();
+            try
+            {
+                /********************************************************************/
+                /* Create a default OdDbDatabase object                             */
+                /********************************************************************/
+                OdDbDatabase pDb = m_DwgHostApp.createDatabase(true, MeasurementValue.kEnglish);
+                OdDbDatabaseSummaryInfo pSumInfo = TD_Db.oddbGetSummaryInfo(pDb);
+                pSumInfo.setComments("File was created by OdWriteEx");
+                TD_Db.oddbPutSummaryInfo(pSumInfo);
+                db = m_DwgHostApp.readFile(fileForReadIn, true, false, FileShareMode.kShareDenyRead);
+                //pDb.copyFrom(db);//.ReadDwgFile(fileForReadIn, System.IO.FileShare.Read, false, "");
+                MemoryManager mMan2 = MemoryManager.GetMemoryManager();
+                MemoryTransaction tr = mMan2.StartTransaction();
+                using (OdDbBlockTable bt = (OdDbBlockTable)db.getBlockTableId().safeOpenObject(OpenMode.kForRead))
+                {
+                    
+                    using (OdDbBlockTableRecord paperSpace = (OdDbBlockTableRecord)db.getPaperSpaceId().safeOpenObject(OpenMode.kForWrite))
+                    {
+                        OdDbObjectIterator pEntIter = paperSpace.newIterator(true, true);
+                        for (pEntIter.start(true, true); !pEntIter.done(); pEntIter.step(true, true))
+                        {
+                            var entity = pEntIter.entity(OpenMode.kForWrite);
+
+                            var entitycopyed = OdDbEntity.createObject();
+
+
+                            OdDbBlockTableRecord modelSpace = (OdDbBlockTableRecord)db.getModelSpaceId().safeOpenObject(OpenMode.kForWrite);
+                            entity.getTransformedCopy(formTransformationMatrix(db, tr, bt), out entitycopyed);
+                            modelSpace.appendOdDbEntity(entitycopyed);
+                            entitycopyed.setDatabaseDefaults(db);
+                        }
+                    }
+
+                }
+                MemoryManager.GetMemoryManager().StopTransaction(tr);
+
+                /********************************************************************/
+                /* Write the database                                                */
+                /********************************************************************/
+                String dstFileName = dwgPath;
+                db.writeFile(dstFileName, SaveType.kDwg, DwgVersion.vAC24, true /* save preview */);
+                Console.WriteLine("Database has been saved as {0}", pDb.getFilename());
+            }
+            catch (OdError e)
+            {
+                Console.WriteLine(string.Format("Error: code: {0}, description: {1}", e.code(), e.description()));
+            }
+            catch (Exception err)
+            {
+                Console.WriteLine("\nUnexpected error.");
+                throw;
+            }
+            finally
+            {
+                mMan.StopTransaction(mTr1);
+            }
+        }
+
+        OdGeMatrix3d formTransformationMatrix(OdDbDatabase db, MemoryTransaction tr, OdDbBlockTable bt)
+        {
+            
+            // get the last viewport
+
+            OdDbViewport viewport =  OdDbViewport.createObject();
+            
+            using (OdDbDictionary layoutDictionary = (OdDbDictionary)db.getLayoutDictionaryId().safeOpenObject(OpenMode.kForRead))
+            {
+                using (OdDbLayout layout = (OdDbLayout)layoutDictionary.getAt("Layout1").safeOpenObject(OpenMode.kForRead))
+                {
+                    using (OdDbObjectIdArray viewports = layout.getViewportArray())
+                    {
+                        if (viewports.Count > 0)
+                            viewport = (OdDbViewport)viewports[viewports.Count - 1].safeOpenObject(OpenMode.kForWrite);
+                        else
+                        {
+                            return new OdGeMatrix3d(); // better throw
+                        }
+                    }
+                }
+            }
+            // get the transformation paper->model matrix; it will be inversed from model->paper matrix
+            return OdDbPointRef.mswcsToPswcs(viewport).inverse();
+
+
+        }`)
+
+        }
+    </script>
+</head>
+
+<body>
+    <div id="changeTxt">
+        <ol>
+            <li>
+                <h2>点击按钮时间会显示在这里</h2>
+                <h4>当前时间：<span id="time_h2"></span></h4>
+                <button class="first" onclick="showTime()" style="color: red;">执行</button>
+            </li>
+            <li>
+                <h2>JavaScript 能够改变 HTML 内容</h2>
+                <h4>你是一个练习js的人:<span id="time_h3"></span></h4>
+                <button class="first" onclick="changeTxtcontent()">执行</button>
+            </li>
+            <li>
+                <h2>JavaScript 创建对象</h2>
+                <h4>对象名称:<span id="span_id"></span>
+                        <script>
+                            var person={name:'wuq' ,mail:'jlkj.net@mail'};
+document.getElementById('span_id').innerHTML=`<div style="background-color:red">
+    ${person.name} is a good person,his mail is ${person.mail}</div>`;
+                        </script>
+                    </span>
+                </h4>
+                <button class="first" onclick="changeTxtpropterty()">执行</button>
+            </li>
+            <li>
+                <h2>JavaScript 字符串操作</h2>
+                <h4>对象名称:<span id="span_id2"></span>
+                        <script>
+                            var text='这是一段话，我怎么知道自己的实力是否不足，';
+                            var targettxt='不';
+                            var index=text.indexOf(targettxt);
+                            var person={name:'wuq' ,mail:'jlkj.net@mail'};
+document.getElementById('span_id2').innerHTML=`<div style="background-color:red">
+    ${targettxt} 在${index}</div>`;
+                        </script>
+                    </span>
+                </h4>
+            </li>
+        </ol>
+
+
+    </div>
+</body>
+
+</html>
